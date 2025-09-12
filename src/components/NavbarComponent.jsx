@@ -5,7 +5,7 @@ const NavbarComponent = () => {
   return (
     <Navbar variant="dark" expand="lg">
       <Container>
-      <Navbar.Brand href="#home"><strong>Kasir</strong> App</Navbar.Brand>
+      <Navbar.Brand href="#home"><strong>3124510030</strong> Rakha Bagus Saktiawan</Navbar.Brand>
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="mr-auto">
