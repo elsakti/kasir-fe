@@ -62,22 +62,21 @@ export default class Hasil extends Component {
 
   handleSubmit = (event) => {
     event.preventDefault();
-
     this.handleClose();
 
     const data = {
       jumlah: this.state.jumlah,
-      total_harga: this.state.totalHarga,
-      product: this.state.keranjangDetail.product,
       keterangan: this.state.keterangan,
     };
 
     axios
       .put(API_URL + "keranjangs/" + this.state.keranjangDetail.id, data)
       .then((res) => {
+        this.props.getListKeranjang(); // ✅ Tambahkan ini
         swal({
           title: "Update Pesanan!",
-          text: "Sukses Update Pesanan " + data.product.nama,
+          text:
+            "Sukses Update Pesanan " + this.state.keranjangDetail.product.nama,
           icon: "success",
           button: false,
           timer: 1500,
@@ -94,6 +93,7 @@ export default class Hasil extends Component {
     axios
       .delete(API_URL + "keranjangs/" + id)
       .then((res) => {
+        this.props.getListKeranjang(); // ✅ Tambahkan ini
         swal({
           title: "Hapus Pesanan!",
           text:
@@ -107,7 +107,7 @@ export default class Hasil extends Component {
         console.log("Error yaa ", error);
       });
   };
-
+  
   render() {
     const { keranjangs } = this.props;
     return (

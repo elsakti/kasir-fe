@@ -17,8 +17,16 @@ export default class Home extends Component {
   }
 
   componentDidMount() {
+    this.getListProducts();
+    this.getListKeranjang();
+  }
+
+  // ✅ HAPUS componentDidUpdate yang lama!
+  // Tidak perlu componentDidUpdate untuk auto-refresh keranjang
+
+  getListProducts = () => {
     axios
-      .get(API_URL + "products?category.nama=" + this.state.categoriYangDipilih)
+      .get(API_URL + "products?category=" + this.state.categoriYangDipilih)
       .then((res) => {
         const menus = res.data;
         this.setState({ menus });
@@ -26,7 +34,9 @@ export default class Home extends Component {
       .catch((error) => {
         console.log("Error yaa ", error);
       });
+  };
 
+  getListKeranjang = () => {
     axios
       .get(API_URL + "keranjangs")
       .then((res) => {
@@ -36,21 +46,7 @@ export default class Home extends Component {
       .catch((error) => {
         console.log("Error yaa ", error);
       });
-  }
-
-  componentDidUpdate(prevState) {
-    if(this.state.keranjangs !== prevState.keranjangs) {
-      axios
-      .get(API_URL + "keranjangs")
-      .then((res) => {
-        const keranjangs = res.data;
-        this.setState({ keranjangs });
-      })
-      .catch((error) => {
-        console.log("Error yaa ", error);
-      });
-    }
-  }
+  };
 
   changeCategory = (value) => {
     this.setState({
@@ -59,7 +55,7 @@ export default class Home extends Component {
     });
 
     axios
-      .get(API_URL + "products?category.nama=" + value)
+      .get(API_URL + "products?category=" + value)
       .then((res) => {
         const menus = res.data;
         this.setState({ menus });
@@ -71,21 +67,22 @@ export default class Home extends Component {
 
   masukKeranjang = (value) => {
     axios
-      .get(API_URL + "keranjangs?product.id=" + value.id)
+      .get(API_URL + "keranjangs?product_id=" + value.id)
       .then((res) => {
         if (res.data.length === 0) {
           const keranjang = {
+            product_id: value.id,
             jumlah: 1,
-            total_harga: value.harga,
-            product: value,
+            keterangan: "",
           };
 
           axios
             .post(API_URL + "keranjangs", keranjang)
             .then((res) => {
+              this.getListKeranjang(); // ✅ Refresh keranjang setelah POST
               swal({
                 title: "Sukses Masuk Keranjang",
-                text: "Sukses Masuk Keranjang " + keranjang.product.nama,
+                text: "Sukses Masuk Keranjang " + value.nama,
                 icon: "success",
                 button: false,
                 timer: 1500,
@@ -97,16 +94,16 @@ export default class Home extends Component {
         } else {
           const keranjang = {
             jumlah: res.data[0].jumlah + 1,
-            total_harga: res.data[0].total_harga + value.harga,
-            product: value,
+            keterangan: res.data[0].keterangan || "",
           };
 
           axios
             .put(API_URL + "keranjangs/" + res.data[0].id, keranjang)
             .then((res) => {
+              this.getListKeranjang(); // ✅ Refresh keranjang setelah PUT
               swal({
                 title: "Sukses Masuk Keranjang",
-                text: "Sukses Masuk Keranjang " + keranjang.product.nama,
+                text: "Sukses Masuk Keranjang " + value.nama,
                 icon: "success",
                 button: false,
                 timer: 1500,
@@ -125,33 +122,37 @@ export default class Home extends Component {
   render() {
     const { menus, categoriYangDipilih, keranjangs } = this.state;
     return (
-        <div className="mt-3">
-          <Container fluid>
-            <Row>
-              <ListCategories
-                changeCategory={this.changeCategory}
-                categoriYangDipilih={categoriYangDipilih}
-              />
-              <Col className="mt-3">
-                <h4>
-                  <strong>Daftar Produk</strong>
-                </h4>
-                <hr />
-                <Row className="overflow-auto menu">
-                  {menus &&
-                    menus.map((menu) => (
-                      <Menus
-                        key={menu.id}
-                        menu={menu}
-                        masukKeranjang={this.masukKeranjang}
-                      />
-                    ))}
-                </Row>
-              </Col>
-              <Hasil keranjangs={keranjangs} {...this.props}/>
-            </Row>
-          </Container>
-        </div>
+      <div className="mt-3">
+        <Container fluid>
+          <Row>
+            <ListCategories
+              changeCategory={this.changeCategory}
+              categoriYangDipilih={categoriYangDipilih}
+            />
+            <Col className="mt-3">
+              <h4>
+                <strong>Daftar Produk</strong>
+              </h4>
+              <hr />
+              <Row className="overflow-auto menu">
+                {menus &&
+                  menus.map((menu) => (
+                    <Menus
+                      key={menu.id}
+                      menu={menu}
+                      masukKeranjang={this.masukKeranjang}
+                    />
+                  ))}
+              </Row>
+            </Col>
+            <Hasil
+              keranjangs={keranjangs}
+              getListKeranjang={this.getListKeranjang}
+              {...this.props}
+            />
+          </Row>
+        </Container>
+      </div>
     );
   }
 }
