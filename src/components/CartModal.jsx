@@ -4,74 +4,74 @@ import React from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import { numberWithCommas } from "../utils/utils";
 
-const ModalKeranjang = ({
+const CartModal = ({
   showModal,
   handleClose,
-  keranjangDetail,
-  jumlah,
-  keterangan,
-  tambah,
-  kurang,
-  changeHandler,
+  cartDetail,
+  quantity,
+  notes,
+  increment,
+  decrement,
+  handleNotesChange,
   handleSubmit,
-  totalHarga,
-  hapusPesanan
+  totalPrice,
+  removeFromCart
 }) => {
-  if (keranjangDetail) {
+  if (cartDetail) {
     return (
       <Modal show={showModal} onHide={handleClose}>
         <Modal.Header closeButton>
           <Modal.Title>
-            {keranjangDetail.product.nama}{" "}
+            {cartDetail.product.name}{" "}
             <strong>
-              (Rp. {numberWithCommas(keranjangDetail.product.harga)})
+              (Rp. {numberWithCommas(cartDetail.product.price)})
             </strong>
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={handleSubmit}>
             <Form.Group controlId="exampleForm.ControlInput1">
-              <Form.Label>Total Harga :</Form.Label>
+              <Form.Label>Total Price:</Form.Label>
               <p>
                 <strong>
-                  Rp. {numberWithCommas(totalHarga)}
+                  Rp. {numberWithCommas(totalPrice)}
                 </strong>
               </p>
             </Form.Group>
 
             <Form.Group controlId="exampleForm.ControlInput1">
-              <Form.Label>Jumlah :</Form.Label>
+              <Form.Label>Quantity:</Form.Label>
               <br />
-              <Button variant="primary" size="sm" className="mr-2" onClick={ () => kurang()}>
+              <Button variant="primary" size="sm" className="mr-2" onClick={ () => decrement()}>
                 <FontAwesomeIcon icon={faMinus} />
               </Button>
 
-              <strong>{jumlah}</strong>
-              
-              <Button variant="primary" size="sm" className="ml-2" onClick={ () => tambah()}>
+              <strong>{quantity}</strong>
+
+              <Button variant="primary" size="sm" className="ml-2" onClick={ () => increment()}>
                 <FontAwesomeIcon icon={faPlus} />
               </Button>
             </Form.Group>
 
             <Form.Group controlId="exampleForm.ControlTextarea1">
-              <Form.Label>Keterangan :</Form.Label>
+              <Form.Label>Notes:</Form.Label>
               <Form.Control
                 as="textarea"
                 rows="3"
-                name="keterangan"
-                placeholder="Contoh : Pedes, Nasi Setengah"
-                value={keterangan}
-                onChange={(event) => changeHandler(event)}
+                name="notes"
+                placeholder="Example: Extra spicy, less rice"
+                value={notes}
+                onChange={(event) => handleNotesChange(event)}
               />
             </Form.Group>
             <Button variant="primary" type="submit">
-                Simpan
-            </Button>   
+                Save
+            </Button>
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="danger" onClick={() => hapusPesanan(keranjangDetail.id)}>
-            <FontAwesomeIcon icon={faTrash} /> Hapus Pesanan
+          <Button variant="danger" onClick={() => removeFromCart(cartDetail.id)}>
+            <FontAwesomeIcon icon={faTrash} /> Remove Item
           </Button>
         </Modal.Footer>
       </Modal>
@@ -80,9 +80,9 @@ const ModalKeranjang = ({
     return (
       <Modal show={showModal} onHide={handleClose}>
         <Modal.Header closeButton>
-          <Modal.Title>Kosong</Modal.Title>
+          <Modal.Title>Empty</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Kosong</Modal.Body>
+        <Modal.Body>No item selected</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
             Close
@@ -96,4 +96,4 @@ const ModalKeranjang = ({
   }
 };
 
-export default ModalKeranjang;
+export default CartModal;
